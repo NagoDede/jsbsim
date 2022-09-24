@@ -425,11 +425,15 @@ bool FGPropulsion::Load(Element* el)
       }
       //Added Hybrid Engine
       else if (engine_element->FindElement("hybrid_engine")) {
-
+        
         HaveElectricEngine = true;
         HavePistonEngine = true;
         if (!IsBound) bind();
         Element *element = engine_element->FindElement("hybrid_engine");
+        Element* pistonelt = element->FindElement("piston_engine");
+        ModelLoader.Open(pistonelt);
+        Element* elecelt = element->FindElement("electric_engine");
+        ModelLoader.Open(elecelt);
         Engines.push_back(new FGHybridEngine(FDMExec, element, numEngines, in));
       }
       else {

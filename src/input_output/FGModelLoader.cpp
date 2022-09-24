@@ -77,7 +77,44 @@ Element_ptr FGModelLoader::Open(Element *el)
     if (document->GetName() != el->GetName()) {
       document->SetParent(el);
       el->AddChildElement(document);
+    } 
+/*-------
+//VD 01/10/2022
+Add case where parent name = child name.
+It allows to import the content of a file in the current element.
+i.e:
+<propulsion>
+    <engine>
+      <hybrid_engine name="Cassio330">
+        <piston_engine file="Akira_H2R"/>
+        ...
+    Note: Take care of the "/" at the end of the declaration.
+
+will be read as
+  <propulsion>
+		<engine>
+			<hybrid_engine name="Cassio330">
+				<piston_engine file="Akira_H2R" name="AkiraH2R">
+					<minmp unit="INHG">         10.0 </minmp>
+					<maxmp unit="INHG">         28.5 </maxmp>
+					<displacement unit="IN3"> 121.5 </displacement>
+					<maxhp>        221.27 </maxhp>
+					<cycles>         4.0 </cycles>
+        ....
+        </piston_engine>
+*/
+    else {
+      //merge the attributes, it allows to recover the name
+      el->MergeAttributes(document);
+      //run accross the elements to add them in the current elt
+      Element* element = document->FindElement();
+      while (element) {
+        el->AddChildElement(element);
+        element->SetParent(el);
+        element = document->FindNextElement();
+      }
     }
+//------------
   }
 
   return document;
