@@ -28,6 +28,8 @@ FUNCTIONAL DESCRIPTION
 --------------------------------------------------------------------------------
 See header file.
 
+It provides an interface for an hybride engine.
+
 HISTORY
 --------------------------------------------------------------------------------
 
