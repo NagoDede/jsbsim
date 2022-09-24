@@ -81,8 +81,8 @@ CLASS DOCUMENTATION
   <ram-air-factor> {number} </ram-air-factor>
   <cooling-factor> {number} </cooling-factor>
   <man-press-lag> {number} </man-press-lag>
-  <starter-torque> {number} </starter-torque> 
-  <starter-rpm> {number} </starter-rpm> 
+  <starter-torque> {number} </starter-torque>
+  <starter-rpm> {number} </starter-rpm>
   <cylinder-head-mass unit="{KG | LBS}"> {number} </cylinder-head-mass>
   <bsfc unit="{LBS/HP*HR | "KG/KW*HR"}"> {number} </bsfc>
   <volumetric-efficiency> {number} </volumetric-efficiency>
@@ -128,7 +128,7 @@ Basic parameters:
 - \b idlerpm - this value affects the throttle fall off and the engine stops
       running if it is slowed below 80% of this value. The engine starts
       running when it reaches 80% of this value.
-- \b maxrpm - this value is used to calculate air-box resistance and BSFC. It 
+- \b maxrpm - this value is used to calculate air-box resistance and BSFC. It
       also affects oil pressure among other things.
 - \b maxhp - this value is the nominal power the engine creates at maxrpm. It
       will determine bsfc if that tag is not input. It also determines the
@@ -144,20 +144,20 @@ Basic parameters:
       efficiency with altitude.
 - \b sparkfaildrop - this is the percentage drop in horsepower for single
       magneto operation.
-- \b static-friction - this value is the power required to turn an engine that 
+- \b static-friction - this value is the power required to turn an engine that
       is not running. Used to control and slow a windmilling propeller. Choose
       a small percentage of maxhp.
 
 Advanced parameters
 - \b bsfc - Indicated Specific Fuel Consumption. The power produced per unit of
       fuel. Higher numbers give worse fuel economy. This number may need to be
-      lowered slightly from actual BSFC numbers because some internal engine 
+      lowered slightly from actual BSFC numbers because some internal engine
       losses are modeled separately. Typically between 0.3 and 0.5
 - \b volumetric-efficiency - the nominal volumetric efficiency of the engine.
       This is the primary way to control fuel flow  Boosted engines may require
       values above 1. Typical engines are 0.80 to 0.82
 - \b air-intake-impedance-factor - this number is the pressure drop across the
-      intake system. Increasing it reduces available manifold pressure. Also a 
+      intake system. Increasing it reduces available manifold pressure. Also a
       property for run-time adjustment.
 - \b ram-air-factor - this number creates increases manifold pressure with an
       increase in dynamic pressure (aircraft speed).
@@ -178,7 +178,7 @@ Supercharge parameters:
       some German engines had continuously variable-speed superchargers.
 - \b boostoverride - whether or not to clip output to the wastegate value
 - \b boost-loss-factor - zero (or not present) for 'free' supercharging. A value entered
-      will be used as a multiplier to the power required to compress the input air. Typical 
+      will be used as a multiplier to the power required to compress the input air. Typical
       value should be 1.15 to 1.20.
 - \b boostmanual - whether a multispeed supercharger will manually or
       automatically shift boost speeds. On manual shifting the boost speeds is
@@ -190,7 +190,7 @@ Supercharge parameters:
       A typical takeoff boost for an early Merlin was about 12psi, compared
       with a rated boost of 9psi.
 
-      When TAKEOFFBOOST is specified in the config file (and is above RATEDBOOST1), 
+      When TAKEOFFBOOST is specified in the config file (and is above RATEDBOOST1),
       the throttle position is interpreted as:
      - 0 to 0.98 : idle manifold pressure to rated boost (where attainable)
      - 0.99, 1.0 : takeoff boost (where attainable).
@@ -224,7 +224,7 @@ class FGPiston : public FGEngine
 {
 public:
   /// Constructor
-  FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input);
+  FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input, string propertypath = "propulsion/engine");
   /// Destructor
   ~FGPiston();
 

@@ -56,7 +56,7 @@ namespace JSBSim {
 CLASS IMPLEMENTATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-FGPiston::FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input)
+FGPiston::FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input, string propertypath)
   : FGEngine(engine_number, input),
   R_air(287.3),                  // Gas constant for air J/Kg/K
   calorific_value_fuel(47.3e6),  // J/Kg
@@ -351,7 +351,7 @@ FGPiston::FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Input
   }
 
   string property_name, base_property_name;
-  base_property_name = CreateIndexedPropertyName("propulsion/engine", EngineNumber);
+  base_property_name = CreateIndexedPropertyName(propertypath, EngineNumber);
   property_name = base_property_name + "/power-hp";
   PropertyManager->Tie(property_name, &HP);
   property_name = base_property_name + "/friction-hp";

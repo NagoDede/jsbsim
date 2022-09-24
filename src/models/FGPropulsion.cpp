@@ -55,6 +55,7 @@ INCLUDES
 #include "models/propulsion/FGElectric.h"
 #include "models/propulsion/FGTurboProp.h"
 #include "models/propulsion/FGTank.h"
+#include "models/propulsion/FGHybridEngine.h"
 #include "input_output/FGModelLoader.h"
 
 using namespace std;
@@ -76,7 +77,7 @@ FGPropulsion::FGPropulsion(FGFDMExec* exec) : FGModel(exec)
   numOxiTanks = numFuelTanks = 0;
   ActiveEngine = -1; // -1: ALL, 0: Engine 1, 1: Engine 2 ...
   tankJ.InitMatrix();
-  DumpRate = 0.0; 
+  DumpRate = 0.0;
   RefuelRate = 6000.0;
   FuelFreeze = false;
   IsBound =
@@ -208,7 +209,7 @@ void FGPropulsion::ConsumeFuel(FGEngine* engine)
             TanksWithFuel++;
             Starved = false;
             FeedListFuel.push_back(TankId);
-          } 
+          }
           break;
         case FGTank::ttOXIDIZER:
           // Skip this here (done below)
@@ -258,17 +259,17 @@ void FGPropulsion::ConsumeFuel(FGEngine* engine)
   if (FuelStarved || (hasOxTanks && OxiStarved)) return;
 
   double FuelToBurn = engine->CalcFuelNeed();            // How much fuel does this engine need?
-  double FuelNeededPerTank = FuelToBurn / TanksWithFuel; // Determine fuel needed per tank.  
+  double FuelNeededPerTank = FuelToBurn / TanksWithFuel; // Determine fuel needed per tank.
   for (unsigned int i=0; i<FeedListFuel.size(); i++) {
-    Tanks[FeedListFuel[i]]->Drain(FuelNeededPerTank); 
+    Tanks[FeedListFuel[i]]->Drain(FuelNeededPerTank);
   }
 
   if (engine->GetType() == FGEngine::etRocket) {
     double OxidizerToBurn = engine->CalcOxidizerNeed();                // How much fuel does this engine need?
     double OxidizerNeededPerTank = 0;
-    if (TanksWithOxidizer > 0) OxidizerNeededPerTank = OxidizerToBurn / TanksWithOxidizer; // Determine fuel needed per tank.  
+    if (TanksWithOxidizer > 0) OxidizerNeededPerTank = OxidizerToBurn / TanksWithOxidizer; // Determine fuel needed per tank.
     for (unsigned int i=0; i<FeedListOxi.size(); i++) {
-      Tanks[FeedListOxi[i]]->Drain(OxidizerNeededPerTank); 
+      Tanks[FeedListOxi[i]]->Drain(OxidizerNeededPerTank);
     }
   }
 
@@ -373,7 +374,7 @@ bool FGPropulsion::Load(Element* el)
   Element* tank_element = el->FindElement("tank");
   while (tank_element) {
     Tanks.push_back(new FGTank(FDMExec, tank_element, numTanks));
-    if (Tanks.back()->GetType() == FGTank::ttFUEL) { 
+    if (Tanks.back()->GetType() == FGTank::ttFUEL) {
       FuelDensity = Tanks[numFuelTanks]->GetDensity();
       numFuelTanks++;
       }
@@ -421,7 +422,17 @@ bool FGPropulsion::Load(Element* el)
         if (!IsBound) bind();
         Element *element = engine_element->FindElement("electric_engine");
         Engines.push_back(new FGElectric(FDMExec, element, numEngines, in));
-      } else {
+      }
+      //Added Hybrid Engine
+      else if (engine_element->FindElement("hybrid_engine")) {
+
+        HaveElectricEngine = true;
+        HavePistonEngine = true;
+        if (!IsBound) bind();
+        Element *element = engine_element->FindElement("hybrid_engine");
+        Engines.push_back(new FGHybridEngine(FDMExec, element, numEngines, in));
+      }
+      else {
         cerr << engine_element->ReadFrom() << " Unknown engine type" << endl;
         return false;
       }
@@ -653,7 +664,7 @@ void FGPropulsion::SetCutoff(int setting)
 
   if (ActiveEngine < 0) {
     for (unsigned i=0; i<Engines.size(); i++) {
-      switch (Engines[i]->GetType()) { 
+      switch (Engines[i]->GetType()) {
         case FGEngine::etTurbine:
           ((FGTurbine*)Engines[i])->SetCutoff(bsetting);
           break;
@@ -665,7 +676,7 @@ void FGPropulsion::SetCutoff(int setting)
       }
     }
   } else {
-    switch (Engines[ActiveEngine]->GetType()) { 
+    switch (Engines[ActiveEngine]->GetType()) {
       case FGEngine::etTurbine:
         ((FGTurbine*)Engines[ActiveEngine])->SetCutoff(bsetting);
         break;
@@ -686,7 +697,7 @@ int FGPropulsion::GetCutoff(void) const
     bool cutoff = true;
 
     for (unsigned i=0; i<Engines.size(); i++) {
-      switch (Engines[i]->GetType()) { 
+      switch (Engines[i]->GetType()) {
       case FGEngine::etTurbine:
         cutoff &= ((FGTurbine*)Engines[i])->GetCutoff();
         break;
@@ -748,7 +759,7 @@ void FGPropulsion::DoRefuel(double time_slice)
 {
   unsigned int i;
 
-  double fillrate = RefuelRate / 60.0 * time_slice;   
+  double fillrate = RefuelRate / 60.0 * time_slice;
   int TanksNotFull = 0;
 
   for (i=0; i<numTanks; i++) {
@@ -815,6 +826,9 @@ void FGPropulsion::bind(void)
     PropertyManager->Tie("propulsion/starter_cmd", this, &FGPropulsion::GetStarter, &FGPropulsion::SetStarter);
     PropertyManager->Tie("propulsion/magneto_cmd", this, (iPMF)0, &FGPropulsion::SetMagnetos);
   }
+
+  //TODO
+  //Add electric engine binding
 
   PropertyManager->Tie("propulsion/active_engine", this, (iPMF)&FGPropulsion::GetActiveEngine,
                         &FGPropulsion::SetActiveEngine);
