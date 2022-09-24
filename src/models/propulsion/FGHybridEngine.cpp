@@ -60,13 +60,15 @@ CLASS IMPLEMENTATION
 FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, FGEngine::Inputs& input)
   : FGEngine(engine_number, input)
 {
-        Load(exec,el);
+      debug_lvl = 4;
+      
+      Load(exec,el);
 
         Type = etHybrid;
 
+        cout << "\n    Hybrid Engine: " << Name << endl;
 
-        base_property_name = CreateIndexedPropertyName("propulsion/engine",
-                engine_number);
+        base_property_name = CreateIndexedPropertyName(PropertyPath, engine_number);
 
         if (el->FindElement("piston_engine"))
         {
@@ -74,7 +76,9 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
 
             ostringstream buf;
             buf << base_property_name << "/piston";
-            pistonEngine = new FGPiston(exec, element, engine_number, in, buf.str());
+            pistonEngine = new FGPiston(exec, element, engine_number, in, Thruster, buf.str() );
+            cout << "\n     - Piston Engine Name: " << pistonEngine->GetName() << endl;
+
         } else
         {
             cerr << el->ReadFrom() << " No piston_engine defined" << endl;
@@ -82,11 +86,12 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
 
         if (el->FindElement("electric_engine"))
         {
-            Element *element = el->FindElement("electric");
+            Element *element = el->FindElement("electric_engine");
 
             ostringstream buf;
             buf << base_property_name << "/electric";
-            elecEngine = new FGElectric(exec, element, engine_number, in, buf.str());
+            elecEngine = new FGElectric(exec, element, engine_number, in,  Thruster, buf.str());
+            cout << "\n     - Electric Engine Name: " << elecEngine->GetName() << endl;
         } else
         {
             cerr << el->ReadFrom() << " No electric defined" << endl;
@@ -102,6 +107,8 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
         SetPropertyTree(exec);
 
         Debug(1); // Call Debug() routine from constructor if needed
+
+        debug_lvl = 1;
 }
 
 
@@ -223,6 +230,7 @@ void FGHybridEngine::Debug(int from)
   if (debug_lvl & 8 ) { // Runtime state variables
   }
   if (debug_lvl & 16) { // Sanity checking
+
   }
   if (debug_lvl & 64) {
     if (from == 0) { // Constructor

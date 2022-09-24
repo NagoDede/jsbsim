@@ -93,7 +93,7 @@ bool FGTurboProp::Load(FGFDMExec* exec, Element *el)
   while(function_element) {
     string name = function_element->GetAttributeValue("name");
     if (name == "EnginePowerVC")
-      function_element->SetAttributeValue("name", string("propulsion/engine[#]/") + name);
+      function_element->SetAttributeValue("name", string(PropertyPath + "[#]/") + name);
 
     function_element = el->FindNextElement("function");
   }
@@ -101,7 +101,7 @@ bool FGTurboProp::Load(FGFDMExec* exec, Element *el)
   FGEngine::Load(exec, el);
   thrusterType = Thruster->GetType();
 
-  string property_prefix = CreateIndexedPropertyName("propulsion/engine", EngineNumber);
+  string property_prefix = CreateIndexedPropertyName(PropertyPath, EngineNumber);
 
   EnginePowerVC = GetPreFunction(property_prefix+"/EnginePowerVC");
 
@@ -147,7 +147,7 @@ bool FGTurboProp::Load(FGFDMExec* exec, Element *el)
       // complain that the property 'EnginePowerVC' is already bound. This is a
       // ugly hack but the functionality is obsolete and will be removed some
       // time in the future.
-      table_element->SetAttributeValue("name", string("propulsion/engine[#]/") + name);
+      table_element->SetAttributeValue("name", string(PropertyPath +"[#]/") + name);
       EnginePowerVC = new FGTable(PropertyManager, table_element,
                                   to_string((int)EngineNumber));
       table_element->SetAttributeValue("name", name);
@@ -546,7 +546,7 @@ int FGTurboProp::InitRunning(void)
 void FGTurboProp::bindmodel(FGPropertyManager* PropertyManager)
 {
   string property_name, base_property_name;
-  base_property_name = CreateIndexedPropertyName("propulsion/engine", EngineNumber);
+  base_property_name = CreateIndexedPropertyName(PropertyPath, EngineNumber);
   property_name = base_property_name + "/n1";
   PropertyManager->Tie( property_name.c_str(), &N1);
   property_name = base_property_name + "/reverser";

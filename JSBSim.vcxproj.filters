@@ -314,6 +314,9 @@
     <ClCompile Include="src\input_output\FGXMLFileRead.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\models\propulsion\FGHybridEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\input_output\FGInputSocket.h">
@@ -662,6 +665,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\JSBSim_API.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\models\propulsion\FGHybridEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

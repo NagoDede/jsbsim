@@ -68,7 +68,7 @@ class FGElectric : public FGEngine
 {
 public:
   /// Constructor
-  FGElectric(FGFDMExec* exec, Element *el, int engine_number, FGEngine::Inputs& input, string propertypath = "propulsion/engine");
+  FGElectric(FGFDMExec* exec, Element *el, int engine_number, FGEngine::Inputs& input, FGThruster* thr = NULL, string propertypath = "propulsion/engine");
   /// Destructor
   ~FGElectric();
 

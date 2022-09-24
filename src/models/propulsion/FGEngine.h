@@ -20,6 +20,7 @@
  Place - Suite 330, Boston, MA  02111-1307, USA.
 
  Further information about the GNU Lesser General Public License can also be found on
+ Further information about the GNU Lesser General Public License can also be found on
  the world wide web at http://www.gnu.org.
 
 FUNCTIONAL DESCRIPTION
@@ -31,6 +32,7 @@ a generic engine.
 HISTORY
 --------------------------------------------------------------------------------
 01/21/99   JSB   Created
+01/10/2022  VDT   Add PropertyPath to replace propulsion/engine.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 SENTRY
@@ -201,6 +203,7 @@ public:
 protected:
 
   std::string Name;
+  std::string PropertyPath = "propulsion/engine";
   const int   EngineNumber;
   EngineType Type;
   double SLFuelFlowMax;
@@ -225,7 +228,7 @@ protected:
 
   std::vector <int> SourceTanks;
 
-  bool Load(FGFDMExec *exec, Element *el);
+  bool Load(FGFDMExec *exec, Element *el, FGThruster *thr = NULL );
   void Debug(int from);
 };
 }

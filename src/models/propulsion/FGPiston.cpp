@@ -35,6 +35,9 @@ parameters given in the engine config file for this class
 HISTORY
 --------------------------------------------------------------------------------
 09/12/2000  JSB  Created
+01/10/2022  VDT  Modify to support Hybrid Engine
+                  Add optional reference to Thruster and propertyPath in Constructor
+                  Replace propulsion/engine by variable PropertyPath. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 INCLUDES
@@ -56,7 +59,7 @@ namespace JSBSim {
 CLASS IMPLEMENTATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-FGPiston::FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input, string propertypath)
+FGPiston::FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input, FGThruster* thr, string propertypath)
   : FGEngine(engine_number, input),
   R_air(287.3),                  // Gas constant for air J/Kg/K
   calorific_value_fuel(47.3e6),  // J/Kg
@@ -64,7 +67,9 @@ FGPiston::FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Input
   Cp_fuel(1700),
   standard_pressure(101320.73)
 {
-  Load(exec, el);
+  PropertyPath = propertypath;
+
+  Load(exec, el, thr);
 
   Element *table_element;
   FGPropertyManager* PropertyManager = exec->GetPropertyManager();

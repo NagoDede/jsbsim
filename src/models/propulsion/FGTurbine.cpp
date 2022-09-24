@@ -436,7 +436,7 @@ bool FGTurbine::Load(FGFDMExec* exec, Element *el)
     if (name == "IdleThrust" || name == "MilThrust" || name == "AugThrust"
         || name == "Injection" || name == "N1SpoolUp" || name == "N1SpoolDown"
         || name == "N2SpoolUp" || name == "N2SpoolDown")
-      function_element->SetAttributeValue("name", string("propulsion/engine[#]/") + name);
+      function_element->SetAttributeValue("name", string(PropertyPath + "[#]/") + name);
 
     function_element = el->FindNextElement("function");
   }
@@ -497,7 +497,7 @@ bool FGTurbine::Load(FGFDMExec* exec, Element *el)
     InjN2increment = el->FindElementValueAsNumber("injection-N2-inc");
   if (el->FindElement("disable-windmill"))
     disableWindmill = el->FindElementValueAsBoolean("disable-windmill");
-  string property_prefix = CreateIndexedPropertyName("propulsion/engine", EngineNumber);
+  string property_prefix = CreateIndexedPropertyName(PropertyPath, EngineNumber);
 
   IdleThrustLookup = GetPreFunction(property_prefix+"/IdleThrust");
   MilThrustLookup = GetPreFunction(property_prefix+"/MilThrust");
@@ -561,7 +561,7 @@ string FGTurbine::GetEngineValues(const string& delimiter)
 void FGTurbine::bindmodel(FGPropertyManager* PropertyManager)
 {
   string property_name, base_property_name;
-  base_property_name = CreateIndexedPropertyName("propulsion/engine", EngineNumber);
+  base_property_name = CreateIndexedPropertyName(PropertyPath, EngineNumber);
   property_name = base_property_name + "/n1";
   PropertyManager->Tie( property_name.c_str(), &N1);
   property_name = base_property_name + "/n2";

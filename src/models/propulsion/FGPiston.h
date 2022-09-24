@@ -224,7 +224,7 @@ class FGPiston : public FGEngine
 {
 public:
   /// Constructor
-  FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input, string propertypath = "propulsion/engine");
+  FGPiston(FGFDMExec* exec, Element* el, int engine_number, struct Inputs& input,  FGThruster* thr = NULL, string propertypath = "propulsion/engine");
   /// Destructor
   ~FGPiston();
 

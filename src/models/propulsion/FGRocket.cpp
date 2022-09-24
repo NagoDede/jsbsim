@@ -284,7 +284,7 @@ string FGRocket::GetEngineValues(const string& delimiter)
 void FGRocket::bindmodel(FGPropertyManager* PropertyManager)
 {
   string property_name, base_property_name;
-  base_property_name = CreateIndexedPropertyName("propulsion/engine", EngineNumber);
+  base_property_name = CreateIndexedPropertyName(PropertyPath, EngineNumber);
 
   property_name = base_property_name + "/total-impulse";
   PropertyManager->Tie( property_name.c_str(), this, &FGRocket::GetTotalImpulse);

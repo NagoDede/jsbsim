@@ -33,7 +33,7 @@ HISTORY
 01/21/99   JSB   Created
 09/03/99   JSB   Changed Rocket thrust equation to correct -= Thrust instead of
                  += Thrust (thanks to Tony Peden)
-
+01/10/2022  VDT  Replace propulsion/engine by PropertyPath
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 INCLUDES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -173,7 +173,7 @@ void FGEngine::LoadThruster(FGFDMExec* exec, Element *thruster_element)
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-bool FGEngine::Load(FGFDMExec *exec, Element *engine_element)
+bool FGEngine::Load(FGFDMExec* exec, Element* engine_element, FGThruster* thr)
 {
   Element* parent_element = engine_element->GetParent();
   Element* local_element;
@@ -191,23 +191,31 @@ bool FGEngine::Load(FGFDMExec *exec, Element *engine_element)
   local_element = parent_element->FindElement("location");
   if (local_element)
     cerr << local_element->ReadFrom()
-         << "Engine location ignored, only thruster location is used." << endl;
+    << "Engine location ignored, only thruster location is used." << endl;
 
   local_element = parent_element->FindElement("orient");
   if (local_element)
     cerr << local_element->ReadFrom()
-         << "Engine orientation ignored, only thruster orientation is used." << endl;
+    << "Engine orientation ignored, only thruster orientation is used." << endl;
 
   // Load thruster
-  local_element = parent_element->FindElement("thruster");
+  if (thr == NULL) {
+    local_element = parent_element->FindElement("thruster");
   if (local_element) {
     try {
       LoadThruster(exec, local_element);
-    } catch (std::string& str) {
+    }
+    catch (std::string& str) {
       throw("Error loading engine " + Name + ". " + str);
     }
-  } else {
+  }
+  else {
     cerr << "No thruster definition supplied with engine definition." << endl;
+  }
+  }
+  else
+  {
+    Thruster = thr;
   }
 
   ResetToIC(); // initialize dynamic terms
@@ -221,7 +229,7 @@ bool FGEngine::Load(FGFDMExec *exec, Element *engine_element)
   }
 
   string property_name, base_property_name;
-  base_property_name = CreateIndexedPropertyName("propulsion/engine", EngineNumber);
+  base_property_name = CreateIndexedPropertyName(PropertyPath, EngineNumber);
 
   property_name = base_property_name + "/set-running";
   PropertyManager->Tie( property_name.c_str(), this, &FGEngine::GetRunning, &FGEngine::SetRunning );

@@ -34,7 +34,9 @@ HISTORY
 --------------------------------------------------------------------------------
 04/07/2004  DPC  Created
 01/06/2005  DPC  Converted to new XML format
-
+01/10/2022  VDT  Modify to support Hybrid Engine
+                  Add optional reference to Thruster and PropertyPath in Constructor
+                  Replace propulsion/engine by variable PropertyPath. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 INCLUDES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -55,10 +57,12 @@ namespace JSBSim {
 CLASS IMPLEMENTATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-FGElectric::FGElectric(FGFDMExec* exec, Element *el, int engine_number, struct FGEngine::Inputs& input, string propertypath)
+FGElectric::FGElectric(FGFDMExec* exec, Element *el, int engine_number, struct FGEngine::Inputs& input, FGThruster* thr, string propertypath)
   : FGEngine(engine_number, input)
 {
-  Load(exec,el);
+  PropertyPath = propertypath;
+
+  Load(exec,el, thr);
 
   Type = etElectric;
   PowerWatts = 745.7;
