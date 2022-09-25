@@ -78,7 +78,7 @@ class FGThruster : public FGForce {
 
 public:
   /// Constructor
-  FGThruster(FGFDMExec *FDMExec, Element *el, int num );
+  FGThruster(FGFDMExec *FDMExec, Element *el, int num, std::string propertyPath = "propulsion/engine");
   /// Destructor
   virtual ~FGThruster();
 

@@ -253,6 +253,7 @@
     <ClInclude Include="src\models\flight_control\FGWaypoint.h" />
     <ClInclude Include="src\models\propulsion\FGHybridEngine.h" />
     <ClInclude Include="src\models\propulsion\FGTransmission.h" />
+    <ClInclude Include="src\models\propulsion\FGHybridTransmission.h" />
     <ClInclude Include="src\simgear\xml\ascii.h" />
     <ClInclude Include="src\simgear\xml\asciitab.h" />
     <ClInclude Include="src\simgear\compiler.h" />
@@ -369,6 +370,7 @@
     <ClCompile Include="src\models\flight_control\FGLinearActuator.cpp" />
     <ClCompile Include="src\models\flight_control\FGWaypoint.cpp" />
     <ClCompile Include="src\models\propulsion\FGHybridEngine.cpp" />
+    <ClCompile Include="src\models\propulsion\FGHybridTransmission.cpp" />
     <ClCompile Include="src\models\propulsion\FGTransmission.cpp" />
     <ClCompile Include="src\simgear\magvar\coremag.cxx" />
     <ClCompile Include="src\simgear\xml\easyxml.cxx" />

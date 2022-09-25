@@ -52,7 +52,7 @@ CLASS IMPLEMENTATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
-FGThruster::FGThruster(FGFDMExec *FDMExec, Element *el, int num ): FGForce(FDMExec)
+FGThruster::FGThruster(FGFDMExec *FDMExec, Element *el, int num, string propertyPath): FGForce(FDMExec)
 {
   Element* thruster_element = el->GetParent();
   Element* element;
@@ -77,7 +77,7 @@ FGThruster::FGThruster(FGFDMExec *FDMExec, Element *el, int num ): FGForce(FDMEx
   SetLocation(location);
 
   string property_name, base_property_name;
-  base_property_name = CreateIndexedPropertyName("propulsion/engine", EngineNum);
+  base_property_name = CreateIndexedPropertyName(propertyPath, EngineNum);
 
   element = thruster_element->FindElement("pointing");
   if (element)  {

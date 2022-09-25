@@ -75,7 +75,7 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
             Element *element = el->FindElement("piston_engine");
 
             ostringstream buf;
-            buf << base_property_name << "/piston";
+            buf << base_property_name << "/ice";
             pistonEngine = new FGPiston(exec, element, engine_number, in, Thruster, buf.str() );
             cout << "\n     - Piston Engine Name: " << pistonEngine->GetName() << endl;
 
@@ -97,6 +97,14 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
             cerr << el->ReadFrom() << " No electric defined" << endl;
         }
 
+        if (el->FindElement("transmission"))
+        {
+          Element* elt = el->FindElement("transmission");
+          LoadTransmission(exec,elt);
+        } else
+          cerr << el->ReadFrom() << " No electric defined" << endl;
+
+
         if (el->FindElement("maxhp"))
             MaxHP = el->FindElementValueAsNumberConvertTo("maxhp","HP");
         if (el->FindElement("maxthrottle"))
@@ -111,6 +119,45 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
         debug_lvl = 1;
 }
 
+
+/*
+Load hybrid transmission data
+*/
+bool FGHybridEngine::LoadTransmission(FGFDMExec* exec, Element* el)
+{
+  if (el->FindElement("isparallel")) {
+    isParallel = el->FindElementValueAsBoolean("isparallel");
+  }
+  else
+    cout << "\n     isParallel not defined. Default is Serie. " << endl;
+
+  if (el->FindElement("ice_side"))
+  {
+    Element* iceElt = el->FindElement("ice_side");
+    ostringstream buf;
+    buf << base_property_name << "/ice";
+    iceTransmission = new FGHybridTransmission(exec, iceElt, 1, buf.str());
+  }
+  else
+  {
+    cerr << el->ReadFrom() << " No transmission defined on ICE side" << endl;
+    return false;
+  }
+
+  if (el->FindElement("elec_side"))
+  {
+    Element* elecElt = el->FindElement("elec_side");
+    ostringstream buf;
+    buf << base_property_name << "/electric";
+    elecTransmission = new FGHybridTransmission(exec, elecElt, 1, buf.str());
+  }
+  else
+  {
+    cerr << el->ReadFrom() << " No transmission defined on ELEC side" << endl;
+    return false;
+  }
+  return true;  
+}
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

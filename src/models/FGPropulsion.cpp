@@ -431,6 +431,7 @@ bool FGPropulsion::Load(Element* el)
         if (!IsBound) bind();
         Element *element = engine_element->FindElement("hybrid_engine");
         Element* pistonelt = element->FindElement("piston_engine");
+        //ToDo Add turboprop / turboreactor engine, be achieved by adding a section ICE (Internal Combustion Engine)
         ModelLoader.Open(pistonelt);
         Element* elecelt = element->FindElement("electric_engine");
         ModelLoader.Open(elecelt);

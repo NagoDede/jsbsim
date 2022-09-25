@@ -46,12 +46,7 @@ INCLUDES
 #include "FGEngine.h"
 #include "FGPiston.h"
 #include "FGElectric.h"
-
-
-
-
-
-
+#include "FGHybridTransmission.h"
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FORWARD DECLARATIONS
@@ -70,22 +65,6 @@ CLASS DOCUMENTATION
     <h3>Configuration File Format:</h3>
 @code
     <hybrid_engine>
-        <engine file="{string}">
-            <feed> {integer} </feed>
-            ... optional more feed tank index numbers ...
-            <thruster file="{string}">
-                <location unit="{IN | M}">
-                    <x> {number} </x>
-                    <y> {number} </y>
-                    <z> {number} </z>
-                </location>
-                <orient unit="{RAD | DEG}">
-                    <roll> {number} </roll>
-                    <pitch> {number} </pitch>
-                    <yaw> {number} </yaw>
-                </orient>
-            </thruster>
-        </engine>
     <hybrid_engine>
 @endcode
 <pre>
@@ -125,6 +104,9 @@ private:
     FGPiston* pistonEngine;
     FGElectric* elecEngine;
 
+    FGHybridTransmission *iceTransmission;
+    FGHybridTransmission *elecTransmission;
+
   // constants
   double hptowatts;
 
@@ -140,12 +122,26 @@ private:
   double HFactorCmd = 0.5;
   double HFactor = 0.0;
 
+  //Transmission parameters
+  bool isParallel = false;
+  //ICE transmission parameters
+  bool iceFreewheel = false; //tied to   < ice_freewheel>1 < / ice_freewheel >
+  bool iceClutch = false; // tied   < ice_clutch>0 < / ice_clutch >
+  double iceRatio = 1.0; //tied to     < ice_ratio>0.46 < / ice_ratio >
+
+  //Elec transmission parameters
+  bool elecFreewheel = false; // < elec_freewheel>1 < / elec_freewheel >
+  bool elecClutch = false; //  < elec_clutch>0 < / elec_clutch >
+  double elecRatio = 1.0; // < elec_ratio>0.86 < / elec_ratio >
+
+
   std::string base_property_name = "";
   void SetPropertyTree(FGFDMExec* exec);
-
   void Debug(int from);
-};
-}
+  bool LoadTransmission(FGFDMExec* exec, Element* el);
+
+}; //end class
+} //end namespace
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #endif
