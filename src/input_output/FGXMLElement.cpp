@@ -119,6 +119,10 @@ Element::Element(const string& nm)
     // Power
     convert["WATTS"]["HP"] = 0.001341022;
     convert["HP"]["WATTS"] = 1.0/convert["WATTS"]["HP"];
+    convert["KW"]["HP"] = 1.3410220888;
+    convert["KW"]["WATTS"] = 1000;
+    convert["WATTS"]["KW"] = 1 / 1000.0;
+    convert["HP"]["KW"] = 0.745699872;
     // Force
     convert["N"]["LBS"] = 0.22482;
     convert["LBS"]["N"] = 1.0/convert["N"]["LBS"];
@@ -208,6 +212,7 @@ Element::Element(const string& nm)
     // Power
     convert["HP"]["HP"] = 1.00;
     convert["WATTS"]["WATTS"] = 1.00;
+    convert["KW"]["KW"] = 1.00;
     // Force
     convert["N"]["N"] = 1.00;
     // Velocity
