@@ -1,5 +1,6 @@
 set(SOURCES FGElectric.cpp
             FGHybridEngine.cpp
+            FGHybridTransmission.cpp
             FGEngine.cpp
             FGForce.cpp
             FGNozzle.cpp
@@ -15,6 +16,7 @@ set(SOURCES FGElectric.cpp
 
 set(HEADERS FGElectric.h
             FGHybridEngine.h
+            FGHybridTransmission.h
             FGEngine.h
             FGForce.h
             FGNozzle.h

@@ -42,7 +42,7 @@ INCLUDES
 
 #include "FGFDMExec.h"
 #include "FGHybridEngine.h"
-#indluce "FGHybridTransmission.h"
+#include "FGHybridTransmission.h"
 
 #include "FGPropeller.h"
 #include "input_output/FGXMLElement.h"
