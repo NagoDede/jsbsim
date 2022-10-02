@@ -349,6 +349,8 @@ protected:
   static constexpr double radtodeg = 180. / M_PI;
   static constexpr double degtorad = M_PI / 180.;
   static constexpr double hptoftlbssec = 550.0;
+  static constexpr double wtoftlbssec = 0.737562;
+  static constexpr double kwtoftlbssec = 737.562;
   static constexpr double psftoinhg = 0.014138;
   static constexpr double psftopa = 47.88;
   static constexpr double ktstofps = 1.68781;
