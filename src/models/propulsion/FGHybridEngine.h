@@ -114,9 +114,9 @@ class FGHybridEngine : public FGEngine
   std::string GetEngineValues(const std::string& delimiter);
 
 private:
-    unsigned int engineNumber;
-    unsigned int iceEngineNumber;
-    unsigned int elecEngineNumber;
+    int engineNumber;
+    int iceEngineNumber;
+    int elecEngineNumber;
     int enginesCnt = 0;
 
     FGPiston* pistonEngine;
