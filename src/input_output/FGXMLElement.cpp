@@ -24,6 +24,10 @@
  Further information about the GNU Lesser General Public License can also be
  found on the world wide web at http://www.gnu.org.
 
+ HISTORY
+--------------------------------------------------------------------------------
+01/10/2022  VDT   Add conversion for Watts to HP and KiloWatts (KW) to Watts or HP
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 INCLUDES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
