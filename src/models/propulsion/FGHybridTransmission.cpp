@@ -8,7 +8,7 @@
  Author:       Vincent DETROYAT
  Date started: 01/10/2022
 
- ------------- Copyright (C) 2022 V. Detroyat (t.kreitler@web.de) -------------
+ ------------- Copyright (C) 2022 V. Detroyat () -------------
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Lesser General Public License as published by the Free Software
@@ -38,6 +38,9 @@ INCLUDES
 
 #include "FGHybridTransmission.h"
 
+#include "FGEngine.h"
+#include "FGFDMExec.h"
+
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FORWARD DECLARATIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -58,9 +61,34 @@ namespace JSBSim {
     Debug(1);
   }
 
+  /*
+  void FGElectric::Calculate(void)
+  {
+    RunPreFunctions();
+
+    if (Thruster->GetType() == FGThruster::ttPropeller) {
+      ((FGPropeller*)Thruster)->SetAdvance(in.PropAdvance[EngineNumber]);
+      ((FGPropeller*)Thruster)->SetFeather(in.PropFeather[EngineNumber]);
+    }
+
+    RPM = Thruster->GetRPM() * Thruster->GetGearRatio();
+
+    HP = PowerWatts * in.ThrottlePos[EngineNumber] / hptowatts;
+
+    LoadThrusterInputs();
+    // Filters out negative powers when the propeller is not rotating.
+    double power = HP * hptoftlbssec;
+    if (RPM <= 0.1) power = max(power, 0.0);
+    Thruster->Calculate(power);
+
+    RunPostFunctions();
+  }
+  */
+
 
   double FGHybridTransmission::Calculate(double enginePower) {
 
+    /*
     double coupling = 1.0, coupling_sq = 1.0;
     double fw_mult = 1.0;
 
@@ -122,8 +150,13 @@ namespace JSBSim {
 
     EngineRPM = EngineRPM / Ratio;
     Thrust = Thruster->GetThrust();
+    */
+
+    EngineRPM = ThrusterRPM / Ratio; 
+
 
     return 0.0;
+
   }
  
   bool FGHybridTransmission::Load(Element* el) {

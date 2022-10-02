@@ -125,6 +125,8 @@ namespace JSBSim {
     
     double GetPowerRequired(void) { return 0.0; }
 
+
+
     void   SetEngineRPM(double x) { EngineRPM = x; }
     double GetEngineRPM() const { return EngineRPM; }
 
@@ -173,8 +175,12 @@ namespace JSBSim {
     double BrakeCtrlNorm;
     double MaxBrakePower;
 
+    double MaxPower;
     double EngineRPM;
     double ThrusterRPM;
+    double CurrentPower; //Power available on the RE + EE at output shafts
+
+
 
     FGThruster *Thruster;
 

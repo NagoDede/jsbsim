@@ -82,7 +82,7 @@ CLASS DECLARATION
 
 class FGHybridEngine : public FGEngine
 {public:
-  /// Constructorma
+  /// Constructor
   FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, FGEngine::Inputs& input);
 
   /// Destructor
@@ -92,29 +92,52 @@ class FGHybridEngine : public FGEngine
     double CalcFuelNeed(void);
 
     FGPiston* GetPistonEngine(void) {return pistonEngine;};
+    /*Used to retrieve the Piston Engine in the Engines list*/
+    void SetPistonEngineId(unsigned int nb) { pistonEngineId = nb; }
     FGElectric* GetElectricEngine(void) {return elecEngine;};
+    /*Used to retrieve the Elec Engine in the Engines list*/
+    void SetElectricEngineId(unsigned int nb) { elecEngineId = nb; }
 
-    double GetPowerAvailable(void) {return (HP * hptoftlbssec);}
+    unsigned int AddEnginesToPropulsionEngines(std::vector <FGEngine*>* Engines);
+
+
+    double GetPowerAvailable(void) const {return (OutputPower);}
+    double GetPowerCmd(void) const { return PowerCmd; }
+    void SetPowerCmd(double pwr) { PowerCmd= pwr; }
+
+    double GetHFactorCmd(void) const { return HFactorCmd; }
+    void SetHFactorCmd(double hf) { HFactorCmd = hf; }
+
     double getRPM(void) {return RPM;}
 
   std::string GetEngineLabels(const std::string& delimiter);
   std::string GetEngineValues(const std::string& delimiter);
 
 private:
+    unsigned int engineNumber;
+    unsigned int iceEngineNumber;
+    unsigned int elecEngineNumber;
+    int enginesCnt = 0;
+
     FGPiston* pistonEngine;
+    unsigned int pistonEngineId;
     FGElectric* elecEngine;
+    unsigned int elecEngineId;
 
     FGHybridTransmission *iceTransmission;
     FGHybridTransmission *elecTransmission;
 
+    FGPropertyManager* PropertyManager;
+
   // constants
   double hptowatts;
 
-  double PowerWatts;         // maximum engine power
+ 
   double RPM = 00;                // revolutions per minute
-  double HP = 0.0;                 // engine output, in horsepower
+  double OutputPower = 0.0;                 // engine output, in Watt
+  double PowerCmd = 0.0; //power cmd in Watt
 
-  double MaxHP = 0.0;             //Maximum HP of the hybrid engine. Some of the RE and EE Max power
+  double MaxPower = 0.0;             //Maximum power in Watt of the hybrid engine. Some of the RE and EE Max power
 
   double MaxThrottle = 1.0;       //full forward position
   double MinThrottle = 0.0;       //Idle
@@ -139,6 +162,16 @@ private:
   void SetPropertyTree(FGFDMExec* exec);
   void Debug(int from);
   bool LoadTransmission(FGFDMExec* exec, Element* el);
+  bool LoadElement(Element* el);
+
+  double ConfigValueConv(Element* e, const std::string& ename, double default_val = 0.0,
+    const std::string& unit = "", bool tell = false);
+
+  double ConfigValue(Element* e, const std::string& ename, double default_val = 0.0,
+    bool tell = false)
+  {
+    return ConfigValueConv(e, ename, default_val, "", tell);
+  };
 
 }; //end class
 } //end namespace

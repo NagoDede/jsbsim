@@ -388,6 +388,9 @@ bool FGPropulsion::Load(Element* el)
 
   ReadingEngine = true;
   Element* engine_element = el->FindElement("engine");
+
+  cout << "LOAD PROPULSION " << endl;
+
   while (engine_element) {
     if (!ModelLoader.Open(engine_element)) return false;
 
@@ -435,9 +438,12 @@ bool FGPropulsion::Load(Element* el)
         ModelLoader.Open(pistonelt);
         Element* elecelt = element->FindElement("electric_engine");
         ModelLoader.Open(elecelt);
-        Engines.push_back(new FGHybridEngine(FDMExec, element, numEngines, in));
+        FGHybridEngine* hybeng = new FGHybridEngine(FDMExec, element, numEngines, in);
+        Engines.push_back(hybeng);
+        numEngines = numEngines + hybeng->AddEnginesToPropulsionEngines(&Engines);
       }
       else {
+
         cerr << engine_element->ReadFrom() << " Unknown engine type" << endl;
         return false;
       }

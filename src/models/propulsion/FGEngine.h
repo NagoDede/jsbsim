@@ -33,6 +33,7 @@ HISTORY
 --------------------------------------------------------------------------------
 01/21/99   JSB   Created
 01/10/2022  VDT   Add PropertyPath to replace propulsion/engine.
+01/10/2022  VDT   Add SetThurster
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 SENTRY
@@ -190,6 +191,7 @@ public:
 
   void LoadThruster(FGFDMExec* exec, Element *el);
   FGThruster* GetThruster(void) const {return Thruster;}
+  void SetThruster(FGThruster* thr) { Thruster = thr; }
 
   unsigned int GetSourceTank(unsigned int i) const;
   size_t GetNumSourceTanks() const {return SourceTanks.size();}

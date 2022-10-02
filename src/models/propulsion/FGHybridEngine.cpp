@@ -63,6 +63,9 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
       debug_lvl = 4;
       
       Load(exec,el);
+      engineNumber = engine_number;
+
+      PropertyManager = exec->GetPropertyManager();
 
         Type = etHybrid;
 
@@ -76,7 +79,10 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
 
             ostringstream buf;
             buf << base_property_name << "/ice";
-            pistonEngine = new FGPiston(exec, element, engine_number, in, Thruster, buf.str() );
+            enginesCnt++;
+            iceEngineNumber = engineNumber + enginesCnt;
+            pistonEngine = new FGPiston(exec, element, iceEngineNumber, in, Thruster, buf.str() );
+
             cout << "\n     - Piston Engine Name: " << pistonEngine->GetName() << endl;
 
         } else
@@ -90,7 +96,9 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
 
             ostringstream buf;
             buf << base_property_name << "/electric";
-            elecEngine = new FGElectric(exec, element, engine_number, in,  Thruster, buf.str());
+            enginesCnt++;
+            elecEngineNumber = engineNumber + enginesCnt;
+            elecEngine = new FGElectric(exec, element, elecEngineNumber, in,  Thruster, buf.str());
             cout << "\n     - Electric Engine Name: " << elecEngine->GetName() << endl;
         } else
         {
@@ -105,12 +113,12 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
           cerr << el->ReadFrom() << " No electric defined" << endl;
 
 
-        if (el->FindElement("maxhp"))
-            MaxHP = el->FindElementValueAsNumberConvertTo("maxhp","HP");
-        if (el->FindElement("maxthrottle"))
-            MaxThrottle = el->FindElementValueAsNumber("maxthrottle");
-        if (el->FindElement("minthrottle"))
-            MinThrottle = el->FindElementValueAsNumber("minthrottle");
+
+
+        LoadElement(el);
+
+        elecEngine->SetThruster(elecTransmission);
+        pistonEngine->SetThruster(iceTransmission);
 
         SetPropertyTree(exec);
 
@@ -119,6 +127,60 @@ FGHybridEngine::FGHybridEngine(FGFDMExec* exec, Element *el, int engine_number, 
         debug_lvl = 1;
 }
 
+unsigned int FGHybridEngine::AddEnginesToPropulsionEngines(std::vector <FGEngine*>* Engines)
+{
+  //Organise the engines in order to have the ICE before the electrical engine
+  if (iceEngineNumber > elecEngineNumber) {
+    unsigned int tp = iceEngineNumber;
+    iceEngineNumber = elecEngineNumber;
+    elecEngineNumber = tp;
+  }
+
+  //Push the engines set in the Hybrid engine in the engines list.
+  Engines->push_back(pistonEngine);
+  Engines->push_back(elecEngine);
+
+  return enginesCnt;
+}
+
+bool FGHybridEngine::LoadElement(Element* el) {
+  MaxPower = ConfigValueConv(el, "maxpower", 340000, "W", true);
+  MaxThrottle = ConfigValue(el, "maxthrottle", 1.0,false);
+  MinThrottle = ConfigValue(el, "minthrottle", 1.0, false);
+  return true;
+}
+
+double FGHybridEngine::ConfigValueConv(Element* el, const string& ename, double default_val,
+  const string& unit, bool tell)
+{
+
+  Element* e = NULL;
+  double val = default_val;
+
+  string pname = "*No parent element*";
+
+  if (el) {
+    e = el->FindElement(ename);
+    pname = el->GetName();
+  }
+
+  if (e) {
+    if (unit.empty()) {
+      val = e->GetDataAsNumber();
+    }
+    else {
+      val = el->FindElementValueAsNumberConvertTo(ename, unit);
+    }
+  }
+  else {
+    if (tell) {
+      cerr << pname << ": missing element '" << ename <<
+        "' using estimated value: " << default_val << endl;
+    }
+  }
+
+  return val;
+}
 
 /*
 Load hybrid transmission data
@@ -170,16 +232,28 @@ FGHybridEngine::~FGHybridEngine()
 
 void FGHybridEngine::SetPropertyTree(FGFDMExec* exec)
 {
-        FGPropertyManager* PropertyManager = exec->GetPropertyManager();
-        std::string property_name;
-        property_name = base_property_name + "/power-hp";
-        PropertyManager->Tie(property_name, &HP);
-        property_name = base_property_name + "/maxhp";
-        PropertyManager->Tie(property_name, &MaxHP);
+
+       string property_name;
+
+        property_name = base_property_name + "/power-watt-cmd";
+        PropertyManager->Tie(property_name.c_str(), this,
+          &FGHybridEngine::GetPowerCmd, &FGHybridEngine::SetPowerCmd);
+
+        property_name = base_property_name + "/h-factor-cmd";
+        PropertyManager->Tie(property_name.c_str(), this,
+          &FGHybridEngine::GetHFactorCmd, &FGHybridEngine::SetHFactorCmd);
+
+
+        property_name = base_property_name + "/maxpower-watt";
+        PropertyManager->Tie(property_name, &MaxPower);
+
+        property_name = base_property_name + "/power-watt";
+        PropertyManager->Tie(property_name, &OutputPower);
+
+
         property_name = base_property_name + "/h-factor";
         PropertyManager->Tie(property_name, &HFactor);
-        property_name = base_property_name + "/h-factor-cmd";
-        PropertyManager->Tie(property_name, &HFactorCmd);
+
 }
 
 
@@ -192,15 +266,22 @@ void FGHybridEngine::Calculate(void)
     ((FGPropeller*)Thruster)->SetFeather(in.PropFeather[EngineNumber]);
   }
 
-  RPM = Thruster->GetRPM() * Thruster->GetGearRatio();
+  RPM = Thruster->GetEngineRPM();
 
-  HP = PowerWatts * in.ThrottlePos[EngineNumber] / hptowatts;
+  OutputPower = MaxPower * in.ThrottlePos[EngineNumber];
+
+  
 
   LoadThrusterInputs();
+
   // Filters out negative powers when the propeller is not rotating.
-  double power = HP * hptoftlbssec;
+  double power = OutputPower * wtoftlbssec;
   if (RPM <= 0.1) power = max(power, 0.0);
   Thruster->Calculate(power);
+
+  iceTransmission->SetThrusterRPM(RPM);
+  elecTransmission->SetThrusterRPM(RPM);
+
 
   RunPostFunctions();
 }
@@ -230,7 +311,7 @@ string FGHybridEngine::GetEngineValues(const string& delimiter)
 {
   std::ostringstream buf;
 
-  buf << HP << delimiter
+  buf << OutputPower << delimiter
      << Thruster->GetThrusterValues(EngineNumber, delimiter);
 
   return buf.str();
@@ -264,7 +345,7 @@ void FGHybridEngine::Debug(int from)
     if (from == 0) { // Constructor
 
       cout << "\n    Engine Name: "         << Name << endl;
-      cout << "      Power Watts: "         << MaxHP << endl;
+      cout << "      Power Watts: "         << MaxPower << endl;
 
     }
   }
